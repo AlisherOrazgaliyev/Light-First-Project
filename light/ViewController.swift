@@ -15,13 +15,26 @@ class ViewController: UIViewController {
             lightOn = !lightOn
             updateView()
     }
-    func updateView(){
+    func updateView() {
         let device = AVCaptureDevice.default(for: AVMediaType.video)
-        if dev = device,
-        view.backgroundColor = lightOn ? .white : .black
+        
+        if let dev = device, dev.hasTorch {
+            view.backgroundColor = .black
+            do {
+                try dev.lockForConfiguration()
+                dev.torchMode = lightOn ? .on : .off
+                dev.unlockForConfiguration()
+            } catch {
+                print(error)
+            }
+        } else {
+            view.backgroundColor = lightOn ? .white : .black
+        }
     }
     
-
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
 override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
